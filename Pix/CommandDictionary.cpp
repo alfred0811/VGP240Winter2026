@@ -17,6 +17,8 @@
 #include "Camera.h"
 #include "CmdEnableDepthBuffer.h"
 #include "CmdCamera.h"
+#include "CmdLights.h"
+#include "CmdSetShadeMode.h"
 
 CommandDictionary* CommandDictionary::Get()
 {
@@ -40,7 +42,9 @@ CommandDictionary::CommandDictionary()
 	// Rasterization commands
 	RegisterCommand<CmdDrawPixel>();
 	RegisterCommand<CmdSetColor>();
+	//RegisterCommand<CmdSetClipping>
 	RegisterCommand<CmdEnableDepthBuffer>();
+	RegisterCommand<CmdSetShadeMode>();
 
 	// Primitives commands
 	RegisterCommand<CmdBeginDraw>();
@@ -60,6 +64,14 @@ CommandDictionary::CommandDictionary()
 	// Camera commands
 	RegisterCommand<CmdSetCameraPosition>();
 	RegisterCommand<CmdSetCameraDirection>();
+
+	// Light commands
+	RegisterCommand<CmdSetLightAmbient>();
+	RegisterCommand<CmdSetLightDiffuse>();
+	RegisterCommand<CmdSetLightSpecular>();
+	RegisterCommand<CmdAddDirectionalLight>();
+	RegisterCommand<CmdAddPointLight>();
+	RegisterCommand<CmdAddSpotLight>();
 }
 
 TextEditor::LanguageDefinition CommandDictionary::GenerateLanguageDefinition()

@@ -3,6 +3,7 @@
 #include "Clipper.h"
 #include "MatrixStack.h"
 #include "Camera.h"
+#include "LightManager.h"
 
 extern float gResolutionX;
 extern float gResolutionY;
@@ -108,6 +109,9 @@ bool PrimitivesManager::EndDraw()
 	Matrix4 matNDC = matWorld * matView * matProj;
 
 	Rasterizer* rasterizer = Rasterizer::Get();
+	LightManager* lm = LightManager::Get();
+
+	ShadeMode shadeMode = rasterizer->GetShadeMode();
 	switch (mTopology)
 	{
 	case Topology::Point:
@@ -139,6 +143,40 @@ bool PrimitivesManager::EndDraw()
 			std::vector<Vertex> triangle = { mVertexBuffer[i - 2], mVertexBuffer[i - 1], mVertexBuffer[i] };
 			if (mApplyTransform)
 			{
+				// if the vertex does not have a normal, give it the face normal
+				if (MathHelper::CheckEqual(MathHelper::MagnitudeSquared(triangle[0].norm), 0.0f))
+				{
+					// calculate the normal in world space
+					Vector3 faceNormal = CreateFaceNormal(triangle);
+					for (uint32_t v = 0; v < triangle.size(); ++v)
+					{
+						triangle[v].norm = faceNormal;
+					}
+				}
+
+				// convert triangle position to world space
+				for (uint32_t v = 0; v < triangle.size(); ++v)
+				{
+					triangle[v].pos = MathHelper::TransformCoord(triangle[v].pos, matWorld);
+					triangle[v].posWorld = triangle[v].pos;
+					triangle[v].norm = MathHelper::TransformNormal(triangle[v].norm, matWorld);
+				}
+				
+				if (shadeMode == ShadeMode::Flat)
+				{
+					triangle[0].color *= lm->ComputeLightColor(triangle[0].pos, triangle[0].norm);
+					triangle[1].color = triangle[0].color;
+					triangle[2].color = triangle[0].color;
+				}
+				else if (shadeMode == ShadeMode::Gouraud)
+				{
+					// apply lighting in world space (Gourand Shading)
+					for (uint32_t v = 0; v < triangle.size(); ++v)
+					{
+						triangle[v].color *= lm->ComputeLightColor(triangle[v].pos, triangle[v].norm);
+					}
+				}
+
 				// convert triangle position to NDC space
 				for (uint32_t v = 0; v < triangle.size(); ++v)
 				{
