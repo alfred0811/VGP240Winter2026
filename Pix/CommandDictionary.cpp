@@ -21,6 +21,8 @@
 #include "CmdSetShadeMode.h"
 #include "CmdModel.h"
 #include "CmdSetTexture.h"
+#include "CmdSetCorrectUV.h"
+#include "CmdSetAddressMode.h"
 
 CommandDictionary* CommandDictionary::Get()
 {
@@ -56,6 +58,8 @@ CommandDictionary::CommandDictionary()
 	RegisterCommand<CmdSetCullMode>();
 	RegisterCommand<CmdModel>();
 	RegisterCommand<CmdSetTexture>();
+	RegisterCommand<CmdSetCorrectUV>();
+	RegisterCommand<CmdSetAddressMode>();
 
 	// Matrix Stack Commands (makes object world transform)
 	RegisterCommand<CmdPushTranslation>();

@@ -16,7 +16,7 @@ public:
 	void Load(const std::string& fileName);
 	const std::string& GetFileName() const;
 
-	X::Color GetPixel(float u, float v) const;
+	X::Color GetPixel(float u, float v, AddressMode addressMode) const;
 
 	int GetWidth() const;
 	int GetHeight() const;

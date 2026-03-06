@@ -96,8 +96,48 @@ const std::string& Texture::GetFileName() const
 }
 
 // passes in a value from 0-1 fro u and v coordinates
-X::Color Texture::GetPixel(float u, float v) const
+X::Color Texture::GetPixel(float u, float v, AddressMode addressMode) const
 {
+    switch (addressMode)
+    {
+    case AddressMode::Border:
+    {
+		// Border, if outside of 0-1, return a border color (HotPink)
+        if (u < 0.0f || u > 1.0f || v < 0.0f || v > 1.0f)
+        {
+            return X::Colors::HotPink;
+		}
+    }
+    break;
+    case AddressMode::Clamp:
+    {
+        // use last color outside 0-1
+        u = std::clamp(u, 0.0f, 1.0f);
+		v = std::clamp(v, 0.0f, 1.0f);  
+    }
+    break;
+    case AddressMode::Wrap:
+    {
+        // reduce value if more than 1, increase if less than 0 to keep between 0-1
+        while (u > 1.0f) { u -= 1.0f; }
+		while (u < 0.0f) { u += 1.0f; }
+		while (v > 1.0f) { v -= 1.0f; }
+		while (v < 0.0f) { v += 1.0f; }
+    }
+    break;
+    case AddressMode::Mirror:
+    {
+        // reduce/increase if outside of 0-2, then if over 1, flip by 2 - value
+		while (u > 2.0f) { u -= 2.0f; }
+		while (u < 0.0f) { u += 2.0f; }
+		u = (u > 1.0f) ? 2.0f - u : u;
+		while (v > 2.0f) { v -= 2.0f; }
+		while (v < 0.0f) { v += 2.0f; }
+		v = (v > 1.0f) ? 2.0f - v : v;
+    }
+    break;
+    }
+
     int uIndex = static_cast<int>(u * (mWidth - 1));
 	int vIndex = static_cast<int>(v * (mHeight - 1));
     return GetPixel(uIndex, vIndex);
