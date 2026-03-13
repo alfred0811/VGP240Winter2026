@@ -23,6 +23,7 @@
 #include "CmdSetTexture.h"
 #include "CmdSetCorrectUV.h"
 #include "CmdSetAddressMode.h"
+#include "CmdSetUseFilter.h"
 
 CommandDictionary* CommandDictionary::Get()
 {
@@ -57,9 +58,12 @@ CommandDictionary::CommandDictionary()
 	RegisterCommand<CmdSetFillMode>();
 	RegisterCommand<CmdSetCullMode>();
 	RegisterCommand<CmdModel>();
+
+	// Texture commands
 	RegisterCommand<CmdSetTexture>();
 	RegisterCommand<CmdSetCorrectUV>();
 	RegisterCommand<CmdSetAddressMode>();
+	RegisterCommand<CmdSetUseFilter>();
 
 	// Matrix Stack Commands (makes object world transform)
 	RegisterCommand<CmdPushTranslation>();
